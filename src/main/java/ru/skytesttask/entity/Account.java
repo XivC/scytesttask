@@ -2,6 +2,6 @@ package ru.skytesttask.entity;
 
 public class Account {
     private int id;
-    private int ownerId;
+    private Payable owner;
     private AccountOwnerType ownerType;
 }
