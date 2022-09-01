@@ -1,7 +1,7 @@
 package ru.skytesttask.entity;
 
 
-enum AccountOwnerType {
+public enum AccountOwnerType {
     USER,
     SYSTEM,
     CLAN,

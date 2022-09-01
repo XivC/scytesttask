@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS transactions (
-    id INT PRIMARY KEY,
+    id  INT AUTO_INCREMENT PRIMARY KEY,
     account_from_id INT NOT NULL,
     account_to_id INT NOT NULL,
     amount INT NOT NULL,

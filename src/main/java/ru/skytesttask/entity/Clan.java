@@ -6,5 +6,5 @@ public class Clan {
     private int id;
     private String name;
     private Account account;
-    private LinkedList<User> users;
+    private LinkedList<Integer> usersIds;
 }

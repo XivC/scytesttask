@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 public class Transaction {
     private int id;
-    private Account from;
-    private Account to;
+    private int fromId;
+    private int to;
     private int amount;
     private LocalDateTime created_at;
     private LocalDateTime updated_at;
