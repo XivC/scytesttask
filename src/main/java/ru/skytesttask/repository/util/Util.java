@@ -1,4 +1,6 @@
-package ru.skytesttask.repository;
+package ru.skytesttask.repository.util;
+
+import ru.skytesttask.repository.util.Storage;
 
 import java.io.File;
 import java.net.URISyntaxException;

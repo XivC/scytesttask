@@ -1,27 +1,26 @@
 package ru.skytesttask.repository;
 
 import ru.skytesttask.entity.Account;
-import ru.skytesttask.entity.AccountOwnerType;
-import ru.skytesttask.entity.User;
+import ru.skytesttask.entity.Clan;
 import ru.skytesttask.repository.util.ScriptExecutor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class AccountRepository {
-    public Account getById(int id){
+public class ClanRepository {
+    public Clan getById(int id){
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(id);
         params.add(scriptParams);
         ScriptExecutor executor = new ScriptExecutor();
-        executor.executeScript("account/get_by_id.sql", params);
-        ResultSet fetchedAccount = executor.getResultSets().get(0);
+        executor.executeScript("clan/get_by_id.sql", params);
+        ResultSet fetched = executor.getResultSets().get(0);
         try {
-            Account res = null;
-            if (fetchedAccount.next()) {
-                res = this.getByRow(fetchedAccount);
+            Clan res = null;
+            if (fetched.next()) {
+                res = this.getByRow(fetched);
             }
             executor.closeConnection();
             return res;
@@ -30,15 +29,14 @@ public class AccountRepository {
             throw new RuntimeException(ex);
         }
     }
-    public int create(Account account){
+    public int create(Clan clan){
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
-        scriptParams.add(account.getOwnerId());
-        scriptParams.add(account.getOwnerType());
-        scriptParams.add(account.getBalance());
+        scriptParams.add(clan.getName());
+        scriptParams.add(clan.getAccountId());
         params.add(scriptParams);
         ScriptExecutor executor = new ScriptExecutor();
-        executor.executeScript("account/create.sql", params);
+        executor.executeScript("clan/create.sql", params);
        try {
            ResultSet keyResultSet = executor.getGeneratedKeys().get(0);
            keyResultSet.next();
@@ -51,25 +49,23 @@ public class AccountRepository {
         }
     }
 
-    public void update(Account account){
+    public void update(Clan clan){
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
-        scriptParams.add(account.getOwnerId());
-        scriptParams.add(account.getOwnerType());
-        scriptParams.add(account.getBalance());
-        scriptParams.add(account.getId());
+        scriptParams.add(clan.getName());
+        scriptParams.add(clan.getAccountId());
+        scriptParams.add(clan.getId());
         params.add(scriptParams);
         ScriptExecutor executor = new ScriptExecutor();
-        executor.executeScript("account/update.sql", params);
+        executor.executeScript("clan/update.sql", params);
         executor.closeConnection();
 
     }
 
-    private Account getByRow(ResultSet resultSet) throws SQLException {
+    private Clan getByRow(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt(1);
-        int ownerId = resultSet.getInt(2);
-        AccountOwnerType type = AccountOwnerType.valueOf(resultSet.getString(3));
-        int balance = resultSet.getInt(4);
-        return new Account(id, ownerId,  balance, type);
+        String name = resultSet.getString(2);
+        int accountId = resultSet.getInt(3);
+        return new Clan(id, name, accountId);
     }
 }

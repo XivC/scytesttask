@@ -1,9 +1,11 @@
-package ru.skytesttask.repository;
+package ru.skytesttask.repository.util;
+
+import org.h2.jdbc.JdbcSQLNonTransientException;
+import ru.skytesttask.repository.util.Storage;
+import ru.skytesttask.repository.util.Util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -12,7 +14,16 @@ import java.util.Scanner;
 public class ScriptExecutor {
     private LinkedList<ResultSet> resultSets;
     private LinkedList<ResultSet> generatedKeys;
+    private final Connection connection;
 
+    public ScriptExecutor(){
+        try {
+            this.connection = Storage.getConnectionPool().getConnection();
+        }
+        catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+    }
     public LinkedList<ResultSet> getResultSets() {
         return resultSets;
     }
@@ -21,12 +32,22 @@ public class ScriptExecutor {
         return generatedKeys;
     }
 
-    public void executeScript(String scriptPath, ArrayList<ArrayList<Object>> params) {
+    public void closeConnection(){
+        try {
+            this.connection.close();
+        }
+        catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void executeScript(String scriptPath, ArrayList<ArrayList<Object>> params, boolean autocommit) {
         LinkedList<ResultSet> result = new LinkedList<>();
         LinkedList<ResultSet> keys = new LinkedList<>();
         try {
-            Connection connection = Storage.getConnectionPool().getConnection();
+
             File scriptFile = Util.getResFile("storage/sql/" + scriptPath);
+            connection.setAutoCommit(autocommit);
             try {
                 Scanner scanner = new Scanner(scriptFile).useDelimiter(";");
                 int queryCounter = 0;
@@ -44,14 +65,11 @@ public class ScriptExecutor {
                     for (Object param : queryParams) {
                         if (param instanceof Integer) {
                             statement.setInt(paramsCounter, (Integer) param);
-                        }
-                        else if (param instanceof String){
+                        } else if (param instanceof String) {
                             statement.setString(paramsCounter, (String) param);
-                        }
-                        else if (param instanceof Enum<?>) {
+                        } else if (param instanceof Enum<?>) {
                             statement.setString(paramsCounter, ((Enum<?>) param).name());
-                        }
-                        else statement.setObject(paramsCounter, param);
+                        } else statement.setObject(paramsCounter, param);
                         paramsCounter++;
                     }
                     statement.execute();
@@ -62,6 +80,8 @@ public class ScriptExecutor {
                     queryCounter++;
 
                 }
+                if (!autocommit) {connection.commit();}
+
                 this.resultSets = result;
                 this.generatedKeys = keys;
 
@@ -69,14 +89,21 @@ public class ScriptExecutor {
 
             } catch (FileNotFoundException ex) {
                 throw new RuntimeException("File " + scriptPath + "not found");
+
             }
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
+
 
     }
 
 
+    public void executeScript(String scriptPath, ArrayList<ArrayList<Object>> params) {
+        this.executeScript(scriptPath, params, true);
+    }
 
+    public void executeTransaction(String scriptPath, ArrayList<ArrayList<Object>> params){
+        this.executeScript(scriptPath, params, false);
+    }
 }

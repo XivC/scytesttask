@@ -6,8 +6,6 @@ CREATE TABLE IF NOT EXISTS transactions (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     state VARCHAR(20),
-    type VARCHAR(20),
-    info JSON
-
+    type VARCHAR(20)
 );
 

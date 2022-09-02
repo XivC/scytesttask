@@ -1,11 +1,11 @@
 package ru.skytesttask.repository;
 
 import ru.skytesttask.entity.User;
+import ru.skytesttask.repository.util.ScriptExecutor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class UserRepository {
     public User getByName(String name){
@@ -18,7 +18,9 @@ public class UserRepository {
             ResultSet targetResult = executor.getResultSets().get(0);
             try {
                 if (!targetResult.next()) return null;
-                return getByRow(targetResult);
+                User res = getByRow(targetResult);
+                executor.closeConnection();
+                return res;
 
             }
             catch (SQLException ex){
@@ -40,7 +42,46 @@ public class UserRepository {
         try {
             ResultSet keyResultSet = executor.getGeneratedKeys().get(0);
             keyResultSet.next();
-            return (int) keyResultSet.getObject(1);
+            int res = (int) keyResultSet.getObject(1);
+            executor.closeConnection();
+            return res;
+        }
+        catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+
+    }
+
+    public void update(User user) {
+        ArrayList<ArrayList<Object>> params = new ArrayList<>();
+        ArrayList<Object> scriptParams = new ArrayList<>();
+        scriptParams.add(user.getName());
+        scriptParams.add(user.getClanId());
+        scriptParams.add(user.getAccountId());
+        scriptParams.add(user.getId());
+        params.add(scriptParams);
+        ScriptExecutor executor = new ScriptExecutor();
+        executor.executeScript("user/update.sql", params);
+        executor.closeConnection();
+    }
+
+    public User getById(int userId){
+        ArrayList<ArrayList<Object>> params = new ArrayList<>();
+        ArrayList<Object> scriptParams = new ArrayList<>();
+        scriptParams.add(userId);
+        params.add(scriptParams);
+        ScriptExecutor executor = new ScriptExecutor();
+        executor.executeScript("user/get_by_id.sql", params);
+        ResultSet targetResult = executor.getResultSets().get(0);
+        try {
+            if (!targetResult.next()) {
+                executor.closeConnection();
+                return null;
+            }
+            User res = getByRow(targetResult);
+            executor.closeConnection();
+            return res;
+
         }
         catch (SQLException ex){
             throw new RuntimeException(ex);

@@ -1,14 +1,9 @@
-package ru.skytesttask.repository;
+package ru.skytesttask.repository.util;
 
-import org.apache.ibatis.jdbc.ScriptRunner;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.sql.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
@@ -23,7 +18,10 @@ public class Storage {
         if (pool == null) {
             pool = JdbcConnectionPool.create("jdbc:h2:~/scytestdb", "sa", "");
 
+            int b = 1;
+
         }
+        int a = pool.getActiveConnections();
         return pool;
     }
 
@@ -33,11 +31,13 @@ public class Storage {
         File orderFile = Util.getResFile("storage/sql/migrations/order");
         try {
             Scanner orderFileScanner = new Scanner(orderFile);
-            ScriptExecutor executor = new ScriptExecutor();
+
             while (orderFileScanner.hasNext()) {
+                ScriptExecutor executor = new ScriptExecutor();
                 String script = "migrations/" + orderFileScanner.nextLine();
                 logger.info("Executing " + script);
                 executor.executeScript(script, new ArrayList<>());
+                executor.closeConnection();
 
             }
         } catch (FileNotFoundException ex) {

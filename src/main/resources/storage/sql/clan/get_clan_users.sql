@@ -1,0 +1,1 @@
+SELECT id FROM users where clan_id = ?;
