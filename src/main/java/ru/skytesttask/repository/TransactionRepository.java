@@ -63,8 +63,10 @@ public class TransactionRepository {
         scriptParams.add(transaction.getToId());
         scriptParams.add(transaction.getAmount());
         scriptParams.add(transaction.getCreatedAt());
+        scriptParams.add(transaction.getUpdatedAt());
         scriptParams.add(transaction.getState());
         scriptParams.add(transaction.getType());
+        scriptParams.add(transaction.getId());
         params.add(scriptParams);
         ScriptExecutor executor = new ScriptExecutor();
         executor.executeScript("transaction/update.sql", params);
@@ -76,12 +78,15 @@ public class TransactionRepository {
         ArrayList<Object> scriptParams1 = new ArrayList<>();
         ArrayList<Object> scriptParams2 = new ArrayList<>();
         ArrayList<Object> scriptParams3 = new ArrayList<>();
+        ArrayList<Object> scriptParams4 = new ArrayList<>();
         scriptParams1.add(transaction.getAmount());
         scriptParams2.add(transaction.getFromId());
         scriptParams3.add(transaction.getToId());
+        scriptParams4.add(transaction.getId());
         params.add(scriptParams1);
         params.add(scriptParams2);
         params.add(scriptParams3);
+        params.add(scriptParams4);
         ScriptExecutor executor = new ScriptExecutor();
         executor.executeTransaction("transaction/perform.sql", params);
         executor.closeConnection();

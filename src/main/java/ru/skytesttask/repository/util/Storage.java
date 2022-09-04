@@ -31,15 +31,16 @@ public class Storage {
         File orderFile = Util.getResFile("storage/sql/migrations/order");
         try {
             Scanner orderFileScanner = new Scanner(orderFile);
-
+            ScriptExecutor executor = new ScriptExecutor();
             while (orderFileScanner.hasNext()) {
-                ScriptExecutor executor = new ScriptExecutor();
+
                 String script = "migrations/" + orderFileScanner.nextLine();
                 logger.info("Executing " + script);
                 executor.executeScript(script, new ArrayList<>());
-                executor.closeConnection();
+
 
             }
+            executor.closeConnection();
         } catch (FileNotFoundException ex) {
             logger.warning(ex.getMessage());
         }

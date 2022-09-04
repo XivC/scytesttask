@@ -29,6 +29,28 @@ public class ClanRepository {
             throw new RuntimeException(ex);
         }
     }
+
+    public Clan getByName(String name){
+        ArrayList<ArrayList<Object>> params = new ArrayList<>();
+        ArrayList<Object> scriptParams = new ArrayList<>();
+        scriptParams.add(name);
+        params.add(scriptParams);
+        ScriptExecutor executor = new ScriptExecutor();
+        executor.executeScript("clan/get_by_name.sql", params);
+        ResultSet fetched = executor.getResultSets().get(0);
+        try {
+            Clan res = null;
+            if (fetched.next()) {
+                res = this.getByRow(fetched);
+            }
+            executor.closeConnection();
+            return res;
+        }
+        catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
     public int create(Clan clan){
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();

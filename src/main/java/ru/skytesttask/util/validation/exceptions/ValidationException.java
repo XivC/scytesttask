@@ -1,4 +1,4 @@
-package ru.skytesttask.util.validation;
+package ru.skytesttask.util.validation.exceptions;
 
 
 import java.util.HashMap;

@@ -1,8 +1,8 @@
 package ru.skytesttask.util.validation;
 
 import ru.skytesttask.entity.User;
-import ru.skytesttask.repository.AccountRepository;
 import ru.skytesttask.repository.UserRepository;
+import ru.skytesttask.util.validation.exceptions.UserValidationException;
 
 import java.util.HashMap;
 

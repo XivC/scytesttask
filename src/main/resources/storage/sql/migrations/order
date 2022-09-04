@@ -1,7 +1,5 @@
 create_accounts_table.sql
 create_clans_table.sql
 create_users_table.sql
-create_clans_users_table.sql
 create_transactions_table.sql
-create_transactions_state_log_table.sql
 create_account_transactions_log.sql

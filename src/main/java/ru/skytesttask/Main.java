@@ -2,42 +2,41 @@ package ru.skytesttask;
 
 import ru.skytesttask.entity.*;
 import ru.skytesttask.repository.AccountRepository;
+import ru.skytesttask.repository.ClanRepository;
 import ru.skytesttask.repository.TransactionRepository;
 import ru.skytesttask.repository.util.Storage;
 import ru.skytesttask.repository.UserRepository;
+import ru.skytesttask.service.impl.ClanService;
+import ru.skytesttask.service.impl.TransactionService;
+import ru.skytesttask.service.impl.UserService;
+import ru.skytesttask.util.validation.exceptions.ValidationException;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.HashMap;
 
 public class Main {
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) throws Exception {
 
         Storage.init();
-        UserRepository rep = new UserRepository();
-        AccountRepository acrep = new AccountRepository();
+        UserService userService = new UserService();
+        ClanService clanService = new ClanService();
+        TransactionService transactionService = new TransactionService();
 
-        Account account = new Account(0, 0, 1000, AccountOwnerType.USER);
-        int accid = acrep.create(account);
-        User u = new User(0, "John", accid, null);
-        account.setId(accid);
-        int userId = rep.create(u);
-        account.setOwnerId(userId);
-        acrep.update(account);
-        Transaction transaction = new Transaction(
-               0,
-               1,
-               2,
-               400,
-                LocalDateTime.now(ZoneOffset.UTC),
-                null,
-                TransactionState.CREATED,
-                TransactionType.USER_TO_CLAN
-        );
-        TransactionRepository transactionRepository = new TransactionRepository();
-        transactionRepository.create(transaction);
-        transactionRepository.perform(transaction);
+        User user = userService.create("Vova2");
+        Clan clan = clanService.create("Clan");
+
+        userService.addToClan(user, clan.getId());
+        try {
+            transactionService.UserAddGoldToClan(user, 100);
+        }
+        catch (ValidationException ex){
+            HashMap<Object, Object> errors = ex.getErrors();
+            int a = 1;
+        }
+
 
 
 
