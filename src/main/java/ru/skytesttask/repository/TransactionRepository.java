@@ -1,6 +1,5 @@
 package ru.skytesttask.repository;
 
-import ru.skytesttask.entity.Clan;
 import ru.skytesttask.entity.Transaction;
 import ru.skytesttask.entity.TransactionState;
 import ru.skytesttask.entity.TransactionType;
@@ -41,6 +40,7 @@ public class TransactionRepository {
         scriptParams.add(transaction.getCreatedAt());
         scriptParams.add(transaction.getState());
         scriptParams.add(transaction.getType());
+        scriptParams.add(transaction.getInfoJson());
         params.add(scriptParams);
         ScriptExecutor executor = new ScriptExecutor();
         executor.executeScript("transaction/create.sql", params);
@@ -66,7 +66,9 @@ public class TransactionRepository {
         scriptParams.add(transaction.getUpdatedAt());
         scriptParams.add(transaction.getState());
         scriptParams.add(transaction.getType());
+        scriptParams.add(transaction.getInfoJson());
         scriptParams.add(transaction.getId());
+
         params.add(scriptParams);
         ScriptExecutor executor = new ScriptExecutor();
         executor.executeScript("transaction/update.sql", params);
@@ -102,7 +104,8 @@ public class TransactionRepository {
                 resultSet.getObject(5, LocalDateTime.class),
                 resultSet.getObject(6, LocalDateTime.class),
                 resultSet.getObject(7, TransactionState.class),
-                resultSet.getObject(8, TransactionType.class)
+                resultSet.getObject(8, TransactionType.class),
+                resultSet.getString(9)
         );
     }
 }

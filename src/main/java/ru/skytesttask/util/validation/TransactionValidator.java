@@ -11,7 +11,6 @@ import ru.skytesttask.service.impl.AccountService;
 import ru.skytesttask.service.impl.ClanService;
 import ru.skytesttask.service.impl.UserService;
 import ru.skytesttask.util.validation.exceptions.TransactionValidationException;
-import ru.skytesttask.util.validation.exceptions.ValidationException;
 
 import java.util.HashMap;
 
@@ -28,7 +27,7 @@ public class TransactionValidator extends Validator<Transaction> {
         HashMap<Object, Object> errors = new HashMap<>();
 
         if (transaction.getAmount() < 0) errors.put("amount", "Amount can't be less then 0");
-
+        if (transaction.getFromId() == transaction.getToId()) errors.put("id", "cant process transaction between equal ids");
         try {
             Account accountFrom = accountService.getById(transaction.getFromId());
             if (
@@ -53,7 +52,10 @@ public class TransactionValidator extends Validator<Transaction> {
             throw new RuntimeException(ex);
         }
 
-        if (!errors.isEmpty()) throw new TransactionValidationException(errors);
+        if (!errors.isEmpty()) {
+            errors.put("transactionid", transaction.getId());
+            throw new TransactionValidationException(errors);
+        }
 
 
     }

@@ -1,12 +1,12 @@
 package ru.skytesttask.repository;
 
-import ru.skytesttask.entity.Account;
 import ru.skytesttask.entity.Clan;
 import ru.skytesttask.repository.util.ScriptExecutor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class ClanRepository {
     public Clan getById(int id){
@@ -82,6 +82,25 @@ public class ClanRepository {
         executor.executeScript("clan/update.sql", params);
         executor.closeConnection();
 
+    }
+
+    public LinkedList<Clan> getAll(){
+        LinkedList<Clan> clans = new LinkedList<>();
+        ArrayList<ArrayList<Object>> params = new ArrayList<>();
+        ArrayList<Object> scriptParams = new ArrayList<>();
+        params.add(scriptParams);
+        ScriptExecutor executor = new ScriptExecutor();
+        executor.executeScript("clan/get_all.sql", params);
+        ResultSet resultSet = executor.getResultSets().get(0);
+        try {
+            while (resultSet.next()) {
+                clans.add(getByRow(resultSet));
+            }
+        }
+        catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+        return clans;
     }
 
     private Clan getByRow(ResultSet resultSet) throws SQLException {

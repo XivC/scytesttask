@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     updated_at TIMESTAMP,
     state VARCHAR(20),
     type VARCHAR(20),
+    info JSON,
     FOREIGN KEY (account_from_id) REFERENCES accounts(id),
     FOREIGN KEY (account_to_id) REFERENCES accounts(id)
 );

@@ -6,6 +6,7 @@ import ru.skytesttask.repository.util.ScriptExecutor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class UserRepository {
     public User getByName(String name){
@@ -87,6 +88,25 @@ public class UserRepository {
             throw new RuntimeException(ex);
         }
 
+    }
+
+    public LinkedList<User> getAll(){
+        ArrayList<ArrayList<Object>> params = new ArrayList<>();
+        ArrayList<Object> scriptParams = new ArrayList<>();
+        LinkedList<User> users = new LinkedList<>();
+        params.add(scriptParams);
+        ScriptExecutor executor = new ScriptExecutor();
+        executor.executeScript("user/get_all.sql", params);
+        ResultSet targetResult = executor.getResultSets().get(0);
+        try {
+            while (targetResult.next()) {
+                users.add(getByRow(targetResult));
+            }
+        }
+        catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+        return users;
     }
 
     private User getByRow(ResultSet resultSet) throws SQLException {

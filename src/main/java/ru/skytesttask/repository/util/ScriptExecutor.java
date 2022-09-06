@@ -1,9 +1,5 @@
 package ru.skytesttask.repository.util;
 
-import org.h2.jdbc.JdbcSQLNonTransientException;
-import ru.skytesttask.repository.util.Storage;
-import ru.skytesttask.repository.util.Util;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;

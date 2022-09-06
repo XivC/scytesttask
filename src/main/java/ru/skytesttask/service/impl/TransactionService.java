@@ -2,15 +2,15 @@ package ru.skytesttask.service.impl;
 
 import ru.skytesttask.entity.*;
 import ru.skytesttask.repository.TransactionRepository;
-import ru.skytesttask.service.exceptions.AccountNotFoundException;
 import ru.skytesttask.service.exceptions.ClanNotFoundException;
 import ru.skytesttask.util.validation.TransactionValidator;
 import ru.skytesttask.util.validation.exceptions.TransactionValidationException;
-import ru.skytesttask.util.validation.exceptions.ValidationException;
+import ru.skytesttask.webserver.util.JsonMapper;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.TimeZone;
+import java.util.HashMap;
 
 public class TransactionService {
     private final TransactionRepository transactionRepository;
@@ -23,29 +23,28 @@ public class TransactionService {
         this.clanService = new ClanService();
     }
 
-    public void UserAddGoldToClan(User user, int amount) throws TransactionValidationException {
-        try {
-            Clan userClan = clanService.getById(user.getClanId());
+    public Transaction UserAddGoldToClan(User user, int amount) throws TransactionValidationException, ClanNotFoundException {
 
-            Transaction transaction = new Transaction(
-                    0,
-                    user.getAccountId(),
-                    userClan.getAccountId(),
-                    amount,
-                    LocalDateTime.now(ZoneOffset.UTC),
-                    null,
-                    TransactionState.CREATED,
-                    TransactionType.USER_TO_CLAN
-            );
+        Clan userClan = clanService.getById(user.getClanId());
 
-            this.tryToPerform(transaction);
+        Transaction transaction = new Transaction(
+                0,
+                user.getAccountId(),
+                userClan.getAccountId(),
+                amount,
+                LocalDateTime.now(ZoneOffset.UTC),
+                null,
+                TransactionState.CREATED,
+                TransactionType.USER_TO_CLAN,
+                "{}"
+        );
 
-        } catch (ClanNotFoundException ex) {
-            throw new RuntimeException(ex);
-        }
+        this.tryToPerform(transaction);
+        return transaction;
+
     }
 
-    public void ClanAddGoldToClan(Clan clanFrom, Clan clanTo, int amount) throws TransactionValidationException {
+    public Transaction ClanAddGoldToClan(Clan clanFrom, Clan clanTo, int amount) throws TransactionValidationException {
 
         Transaction transaction = new Transaction(
                 0,
@@ -55,14 +54,16 @@ public class TransactionService {
                 LocalDateTime.now(ZoneOffset.UTC),
                 null,
                 TransactionState.CREATED,
-                TransactionType.CLAN_TO_CLAN
+                TransactionType.CLAN_TO_CLAN,
+                "{}"
         );
 
         this.tryToPerform(transaction);
+        return transaction;
 
     }
 
-    public void SystemAddGoldToClan(Clan clan, int amount) throws  TransactionValidationException{
+    public Transaction SystemAddGoldToClan(Clan clan, int amount) throws TransactionValidationException {
         Account systemAccount = accountService.create(amount, AccountOwnerType.SYSTEM);
 
         Transaction transaction = new Transaction(
@@ -73,10 +74,12 @@ public class TransactionService {
                 LocalDateTime.now(ZoneOffset.UTC),
                 null,
                 TransactionState.CREATED,
-                TransactionType.CLAN_TO_CLAN
+                TransactionType.CLAN_TO_CLAN,
+                "{}"
         );
 
         this.tryToPerform(transaction);
+        return transaction;
     }
 
 
@@ -86,8 +89,14 @@ public class TransactionService {
         try {
             (new TransactionValidator()).validate(transaction);
         } catch (TransactionValidationException ex) {
+            JsonMapper<HashMap> mapper = new JsonMapper<>(HashMap.class);
             transaction.setState(TransactionState.DECLINED);
             transaction.setUpdatedAt(LocalDateTime.now(ZoneOffset.UTC));
+            try {
+                transaction.setInfoJson(mapper.getJson(ex.getErrors()));
+            } catch (IOException ex2) {
+                throw new RuntimeException(ex2);
+            }
             transactionRepository.update(transaction);
             throw ex;
         }

@@ -9,6 +9,8 @@ import ru.skytesttask.service.exceptions.ClanNotFoundException;
 import ru.skytesttask.util.validation.ClanValidator;
 import ru.skytesttask.util.validation.exceptions.ClanValidationException;
 
+import java.util.LinkedList;
+
 public class ClanService implements IClanService {
 
     private final ClanRepository clanRepository;
@@ -21,6 +23,13 @@ public class ClanService implements IClanService {
     public Clan getById(int id) throws ClanNotFoundException {
 
         Clan clan = clanRepository.getById(id);
+        if (clan == null) throw new ClanNotFoundException();
+        return clan;
+    }
+
+    @Override
+    public Clan getByName(String name) throws ClanNotFoundException {
+        Clan clan = clanRepository.getByName(name);
         if (clan == null) throw new ClanNotFoundException();
         return clan;
     }
@@ -46,5 +55,10 @@ public class ClanService implements IClanService {
         accountService.save(account);
         return clan;
 
+    }
+
+    @Override
+    public LinkedList<Clan> getAll() {
+        return clanRepository.getAll();
     }
 }

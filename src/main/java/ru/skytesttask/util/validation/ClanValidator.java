@@ -15,7 +15,7 @@ public class ClanValidator extends Validator<Clan>{
             errors.put("name", "Clan name can't be void");
         }
         if (repository.getByName(clan.getName()) != null){
-            errors.put("identity", "Clan with name " + clan.getName() + "already exists");
+            errors.put("identity", "Clan with name " + clan.getName() + " already exists");
         }
         if (!errors.isEmpty()) throw new ClanValidationException(errors);
 

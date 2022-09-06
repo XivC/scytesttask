@@ -2,7 +2,6 @@ package ru.skytesttask.repository;
 
 import ru.skytesttask.entity.Account;
 import ru.skytesttask.entity.AccountOwnerType;
-import ru.skytesttask.entity.User;
 import ru.skytesttask.repository.util.ScriptExecutor;
 
 import java.sql.ResultSet;

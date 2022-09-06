@@ -10,6 +10,8 @@ import ru.skytesttask.service.exceptions.UserNotFoundException;
 import ru.skytesttask.util.validation.UserValidator;
 import ru.skytesttask.util.validation.exceptions.UserValidationException;
 
+import java.util.LinkedList;
+
 public class UserService implements IUserService {
 
     private final UserRepository repository;
@@ -50,6 +52,11 @@ public class UserService implements IUserService {
         accountService.save(account);
         return user;
 
+    }
+
+    @Override
+    public LinkedList<User> getAll(){
+        return repository.getAll();
     }
 
     @Override

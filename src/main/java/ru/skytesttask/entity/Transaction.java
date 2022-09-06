@@ -1,7 +1,5 @@
 package ru.skytesttask.entity;
 
-import org.h2.util.json.JSONObject;
-
 import java.time.LocalDateTime;
 
 public class Transaction {
@@ -13,9 +11,10 @@ public class Transaction {
     private LocalDateTime updatedAt;
     private TransactionState state;
     private TransactionType type;
+    private String infoJson;
 
 
-    public Transaction(int id, int fromId, int toId, int amount, LocalDateTime createdAt, LocalDateTime updatedAt, TransactionState state, TransactionType type) {
+    public Transaction(int id, int fromId, int toId, int amount, LocalDateTime createdAt, LocalDateTime updatedAt, TransactionState state, TransactionType type, String infoJson) {
         this.id = id;
         this.fromId = fromId;
         this.toId = toId;
@@ -24,6 +23,7 @@ public class Transaction {
         this.updatedAt = updatedAt;
         this.state = state;
         this.type = type;
+        this.infoJson = infoJson;
     }
 
     public int getId() {
@@ -88,5 +88,13 @@ public class Transaction {
 
     public void setType(TransactionType type) {
         this.type = type;
+    }
+
+    public String getInfoJson() {
+        return infoJson;
+    }
+
+    public void setInfoJson(String infoJson) {
+        this.infoJson = infoJson;
     }
 }
