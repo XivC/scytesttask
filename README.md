@@ -1,7 +1,7 @@
 # Тестовое задание в Scytec Games
 
 ## Установка и запуск
->mvn clean package
+> mvn clean package 
 > java -jar target/scytesttask-1.0-jar-with-dependencies.jar
 
 Сервер разворачивается на 80-м порте.
