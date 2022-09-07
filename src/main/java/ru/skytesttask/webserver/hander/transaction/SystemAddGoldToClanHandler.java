@@ -7,8 +7,6 @@ import ru.skytesttask.entity.Transaction;
 import ru.skytesttask.service.IClanService;
 import ru.skytesttask.service.ITransactionService;
 import ru.skytesttask.service.exceptions.ClanNotFoundException;
-import ru.skytesttask.service.impl.ClanService;
-import ru.skytesttask.service.impl.TransactionService;
 import ru.skytesttask.util.validation.exceptions.TransactionValidationException;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
@@ -25,13 +23,15 @@ public class SystemAddGoldToClanHandler implements HttpHandler {
     private final IClanService clanService;
     private final JsonMapper<Transaction> transactionJsonMapper;
 
-    public SystemAddGoldToClanHandler(ITransactionService transactionService){
+    public SystemAddGoldToClanHandler(ITransactionService transactionService) {
         this.transactionService = transactionService;
         this.clanService = transactionService.getClanService();
         this.transactionJsonMapper = new JsonMapper<>(Transaction.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equals("POST")) return;
         Map<String, String> queryParams = Util.getQueryParams(exchange.getRequestURI().getQuery());
         OutputStream os = exchange.getResponseBody();
         exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -43,15 +43,13 @@ public class SystemAddGoldToClanHandler implements HttpHandler {
 
         try {
             clanId = Integer.valueOf(clanIdString);
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             errors.put("clanid", "Clan id must be integer");
         }
 
-        try{
+        try {
             amount = Integer.valueOf(amountString);
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             errors.put("amount", "amount must be integer");
         }
 
@@ -60,37 +58,33 @@ public class SystemAddGoldToClanHandler implements HttpHandler {
         try {
             if (clanId != null) clan = clanService.getById(clanId);
             else errors.put("clanid", "clanidfrom is required param");
-        }
-        catch (ClanNotFoundException ex){
+        } catch (ClanNotFoundException ex) {
             errors.put("clan", "clan with id " + clanIdString + " not found");
         }
 
         try {
             if (clanId != null) clan = clanService.getById(clanId);
             else errors.put("clanid", "clanid is required param");
-        }
-        catch (ClanNotFoundException ex){
+        } catch (ClanNotFoundException ex) {
             errors.put("clan", "clan with id " + clanIdString + " not found");
         }
 
         String answer = "";
         try {
-            if (clan != null &&  amount != null){
+            if (clan != null && amount != null) {
 
                 Transaction transaction = transactionService.systemAddGoldToClan(clan, amount);
                 answer = transactionJsonMapper.getJson(transaction);
 
             }
-        }
-        catch (TransactionValidationException ex){
+        } catch (TransactionValidationException ex) {
             errors.putAll(ex.getErrors());
         }
 
-        if (errors.isEmpty()){
+        if (errors.isEmpty()) {
             exchange.sendResponseHeaders(200, answer.getBytes(StandardCharsets.UTF_8).length);
 
-        }
-        else {
+        } else {
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);
         }

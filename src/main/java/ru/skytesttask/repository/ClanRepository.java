@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class ClanRepository {
-    public Clan getById(int id){
+    public Clan getById(int id) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(id);
@@ -24,13 +24,12 @@ public class ClanRepository {
             }
             executor.closeConnection();
             return res;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public Clan getByName(String name){
+    public Clan getByName(String name) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(name);
@@ -45,13 +44,12 @@ public class ClanRepository {
             }
             executor.closeConnection();
             return res;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public int create(Clan clan){
+    public int create(Clan clan) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(clan.getName());
@@ -59,19 +57,18 @@ public class ClanRepository {
         params.add(scriptParams);
         ScriptExecutor executor = new ScriptExecutor();
         executor.executeScript("clan/create.sql", params);
-       try {
-           ResultSet keyResultSet = executor.getGeneratedKeys().get(0);
-           keyResultSet.next();
-           int res = (int) keyResultSet.getObject(1);
-           executor.closeConnection();
-           return res;
-       }
-        catch (SQLException ex){
+        try {
+            ResultSet keyResultSet = executor.getGeneratedKeys().get(0);
+            keyResultSet.next();
+            int res = (int) keyResultSet.getObject(1);
+            executor.closeConnection();
+            return res;
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public void update(Clan clan){
+    public void update(Clan clan) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(clan.getName());
@@ -84,7 +81,7 @@ public class ClanRepository {
 
     }
 
-    public LinkedList<Clan> getAll(){
+    public LinkedList<Clan> getAll() {
         LinkedList<Clan> clans = new LinkedList<>();
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
@@ -96,8 +93,7 @@ public class ClanRepository {
             while (resultSet.next()) {
                 clans.add(getByRow(resultSet));
             }
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
         return clans;

@@ -15,7 +15,7 @@ public class UserValidator extends Validator<User> {
             errors.put("name", "Name can't be void");
         }
 
-        if (userRepository.getByName(user.getName()) != null){
+        if (userRepository.getByName(user.getName()) != null) {
             errors.put("identity", "User with this name already exists");
         }
 

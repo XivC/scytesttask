@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.Clan;
 import ru.skytesttask.service.IClanService;
-import ru.skytesttask.service.impl.ClanService;
 import ru.skytesttask.webserver.util.JsonMapper;
 
 import java.io.IOException;
@@ -17,11 +16,12 @@ public class GetAllClansHandler implements HttpHandler {
     private final IClanService clanService;
     private final JsonMapper<LinkedList> clansListJsonMapper;
 
-    public GetAllClansHandler(IClanService clanService){
+    public GetAllClansHandler(IClanService clanService) {
         super();
         this.clanService = clanService;
         this.clansListJsonMapper = new JsonMapper<>(LinkedList.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         OutputStream os = exchange.getResponseBody();

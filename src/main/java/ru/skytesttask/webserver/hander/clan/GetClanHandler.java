@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.Clan;
 import ru.skytesttask.service.IClanService;
 import ru.skytesttask.service.exceptions.ClanNotFoundException;
-import ru.skytesttask.service.impl.ClanService;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
 
@@ -19,11 +18,12 @@ public class GetClanHandler implements HttpHandler {
     private final IClanService clanService;
     private final JsonMapper<Clan> clanJsonMapper;
 
-    public GetClanHandler(IClanService clanService){
+    public GetClanHandler(IClanService clanService) {
         super();
         this.clanService = clanService;
         this.clanJsonMapper = new JsonMapper<>(Clan.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
@@ -32,11 +32,10 @@ public class GetClanHandler implements HttpHandler {
         exchange.getResponseHeaders().set("Content-Type", "application/json");
         HashMap<Object, Object> errors = new HashMap<>();
         Integer clanId = null;
-        String name = queryParams.get("name");;
+        String name = queryParams.get("name");
         try {
             clanId = Integer.valueOf(queryParams.get("id"));
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             if (name == null) errors.put("id", "Id should be number");
         }
         Clan clan = null;
@@ -44,16 +43,14 @@ public class GetClanHandler implements HttpHandler {
             if (clanId != null) clan = clanService.getById(clanId);
             else if (name != null) clan = clanService.getByName(name);
             else errors.put("request", "You should pass both id or name to find clan");
-        }
-        catch (ClanNotFoundException ex) {
+        } catch (ClanNotFoundException ex) {
             errors.put("identity", "clan not found");
         }
         String answer;
         if (errors.isEmpty()) {
             answer = clanJsonMapper.getJson(clan);
             exchange.sendResponseHeaders(200, answer.getBytes(StandardCharsets.UTF_8).length);
-        }
-        else {
+        } else {
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);
         }

@@ -11,13 +11,11 @@ public interface IClanService {
 
     Clan getByName(String name) throws ClanNotFoundException;
 
-    void save(Clan clan) throws ClanValidationException ;
+    void save(Clan clan) throws ClanValidationException;
 
     Clan create(String ClanName) throws ClanValidationException;
 
     LinkedList<Clan> getAll();
-
-
 
 
 }

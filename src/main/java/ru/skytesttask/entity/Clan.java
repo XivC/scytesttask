@@ -1,6 +1,6 @@
 package ru.skytesttask.entity;
 
-public class Clan implements Payable{
+public class Clan implements Payable {
     private int id;
     private String name;
     private Integer accountId;

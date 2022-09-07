@@ -1,7 +1,9 @@
 package ru.skytesttask.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ru.skytesttask.entity.*;
+import ru.skytesttask.entity.Transaction;
+import ru.skytesttask.entity.TransactionState;
+import ru.skytesttask.entity.TransactionType;
 import ru.skytesttask.repository.util.ScriptExecutor;
 
 import java.io.IOException;
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class TransactionRepository {
-    public Transaction getById(int id){
+    public Transaction getById(int id) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(id);
@@ -27,12 +29,12 @@ public class TransactionRepository {
             }
             executor.closeConnection();
             return res;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
-    public int create(Transaction transaction){
+
+    public int create(Transaction transaction) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(transaction.getFromId());
@@ -51,13 +53,12 @@ public class TransactionRepository {
             int res = (int) keyResultSet.getObject(1);
             executor.closeConnection();
             return res;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public void update(Transaction transaction){
+    public void update(Transaction transaction) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(transaction.getFromId());
@@ -76,7 +77,7 @@ public class TransactionRepository {
         executor.closeConnection();
     }
 
-    public void perform(Transaction transaction){
+    public void perform(Transaction transaction) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams1 = new ArrayList<>();
         ArrayList<Object> scriptParams2 = new ArrayList<>();
@@ -95,7 +96,7 @@ public class TransactionRepository {
         executor.closeConnection();
     }
 
-    public LinkedList<Transaction> getAccountTransactions(Integer from, Integer to){
+    public LinkedList<Transaction> getAccountTransactions(Integer from, Integer to) {
         LinkedList<Transaction> result = new LinkedList<>();
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
@@ -105,12 +106,10 @@ public class TransactionRepository {
         if (from == null) {
             scriptParams.add(to);
             executor.executeScript("transaction/get_account_to_transactions.sql", params);
-        }
-        else if (to == null) {
+        } else if (to == null) {
             scriptParams.add(from);
             executor.executeScript("transaction/get_account_from_transactions.sql", params);
-        }
-        else {
+        } else {
             scriptParams.add(from);
             scriptParams.add(to);
             executor.executeScript("transaction/get_account_from_to_transactions.sql", params);
@@ -121,8 +120,7 @@ public class TransactionRepository {
                 result.add(getByRow(resultSet));
             }
             return result;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -133,8 +131,7 @@ public class TransactionRepository {
         String info;
         try {
             info = mapper.readTree(resultSet.getString(9)).asText();
-        }
-        catch (IOException ex){
+        } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
         return new Transaction(
@@ -147,7 +144,6 @@ public class TransactionRepository {
                 TransactionState.valueOf(resultSet.getString(7)),
                 TransactionType.valueOf(resultSet.getString(8)),
                 info
-
 
 
         );

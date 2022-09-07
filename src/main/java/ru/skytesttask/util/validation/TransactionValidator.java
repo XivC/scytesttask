@@ -7,12 +7,6 @@ import ru.skytesttask.entity.User;
 import ru.skytesttask.repository.AccountRepository;
 import ru.skytesttask.repository.ClanRepository;
 import ru.skytesttask.repository.UserRepository;
-import ru.skytesttask.service.exceptions.AccountNotFoundException;
-import ru.skytesttask.service.exceptions.ClanNotFoundException;
-import ru.skytesttask.service.exceptions.UserNotFoundException;
-import ru.skytesttask.service.impl.AccountService;
-import ru.skytesttask.service.impl.ClanService;
-import ru.skytesttask.service.impl.UserService;
 import ru.skytesttask.util.validation.exceptions.TransactionValidationException;
 
 import java.util.HashMap;
@@ -31,31 +25,31 @@ public class TransactionValidator extends Validator<Transaction> {
         HashMap<Object, Object> errors = new HashMap<>();
 
         if (transaction.getAmount() < 0) errors.put("amount", "Amount can't be less then 0");
-        if (transaction.getFromId() == transaction.getToId()) errors.put("id", "cant process transaction between equal ids");
+        if (transaction.getFromId() == transaction.getToId())
+            errors.put("id", "cant process transaction between equal ids");
         try {
             Account accountFrom = accountRepository.getById(transaction.getFromId());
             if (
                     accountFrom.getBalance() < transaction.getAmount()
-                    &&
-                    transaction.getType() != TransactionType.SYSTEM_TO_CLAN) {
+                            &&
+                            transaction.getType() != TransactionType.SYSTEM_TO_CLAN) {
                 errors.put("balance", "Payer have no enough gold");
             }
             if (transaction.getType() == TransactionType.USER_TO_CLAN) {
                 UserRepository userRepository = new UserRepository();
-                ClanRepository clanRepository= new ClanRepository();
+                ClanRepository clanRepository = new ClanRepository();
                 User user = userRepository.getById(accountFrom.getOwnerId());
                 if (user.getClanId() == null) errors.put("clan", "user not in clan");
-                else if (clanRepository.getById(user.getClanId()).getAccountId() != transaction.getToId()){
+                else if (clanRepository.getById(user.getClanId()).getAccountId() != transaction.getToId()) {
                     errors.put("clan", "User not a member of this clan");
                 }
 
             }
 
-        }
-        catch ( NullPointerException ex) {
+        } catch (NullPointerException ex) {
             throw new RuntimeException(ex);   //Due to user can't create a transaction, we think that all ids in transaction are valid.
-                                              //Invalid id in transaction is an internal error and we shouldn't show it to user
-                                              //Logging is needed here to catch corrupted ids.
+            //Invalid id in transaction is an internal error and we shouldn't show it to user
+            //Logging is needed here to catch corrupted ids.
         }
 
         if (!errors.isEmpty()) {

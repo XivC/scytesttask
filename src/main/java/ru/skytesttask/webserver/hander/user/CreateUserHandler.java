@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.User;
 import ru.skytesttask.service.IUserService;
-import ru.skytesttask.service.impl.UserService;
 import ru.skytesttask.util.validation.exceptions.UserValidationException;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
@@ -20,14 +19,15 @@ public class CreateUserHandler implements HttpHandler {
     private final IUserService userService;
     private final JsonMapper<User> userJsonMapper;
 
-    public CreateUserHandler(IUserService userService){
+    public CreateUserHandler(IUserService userService) {
         super();
         this.userService = userService;
         this.userJsonMapper = new JsonMapper<>(User.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-
+        if (!exchange.getRequestMethod().equals("POST")) return;
         Map<String, String> queryParams = Util.getQueryParams(exchange.getRequestURI().getQuery());
         OutputStream os = exchange.getResponseBody();
         exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -37,8 +37,7 @@ public class CreateUserHandler implements HttpHandler {
             User user = userService.create(name);
             answer = userJsonMapper.getJson(user);
             exchange.sendResponseHeaders(201, answer.getBytes(StandardCharsets.UTF_8).length);
-        }
-        catch (UserValidationException ex){
+        } catch (UserValidationException ex) {
             HashMap<Object, Object> errors = ex.getErrors();
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);

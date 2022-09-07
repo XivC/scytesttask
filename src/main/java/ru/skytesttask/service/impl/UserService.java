@@ -16,7 +16,7 @@ public class UserService implements IUserService {
 
     private final UserRepository repository;
 
-    public UserService(){
+    public UserService() {
         this.repository = new UserRepository();
     }
 
@@ -28,7 +28,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getByName(String name) throws UserNotFoundException{
+    public User getByName(String name) throws UserNotFoundException {
         User user = repository.getByName(name);
         if (user == null) throw new UserNotFoundException();
         return user;
@@ -55,7 +55,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public LinkedList<User> getAll(){
+    public LinkedList<User> getAll() {
         return repository.getAll();
     }
 

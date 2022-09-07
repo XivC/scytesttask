@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Util {
-    public static Map<String, String> getQueryParams(String query){
-        if (query == null || query.isEmpty()){
+    public static Map<String, String> getQueryParams(String query) {
+        if (query == null || query.isEmpty()) {
             return Collections.emptyMap();
         }
         Pattern pattern = Pattern.compile("&");

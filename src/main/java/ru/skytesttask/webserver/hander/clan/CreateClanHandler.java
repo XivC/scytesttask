@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.Clan;
 import ru.skytesttask.service.IClanService;
-import ru.skytesttask.service.impl.ClanService;
 import ru.skytesttask.util.validation.exceptions.ClanValidationException;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
@@ -20,14 +19,15 @@ public class CreateClanHandler implements HttpHandler {
     private final IClanService clanService;
     private final JsonMapper<Clan> clanJsonMapper;
 
-    public CreateClanHandler(IClanService clanService){
+    public CreateClanHandler(IClanService clanService) {
         super();
         this.clanService = clanService;
         this.clanJsonMapper = new JsonMapper<>(Clan.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-
+        if (!exchange.getRequestMethod().equals("POST")) return;
         Map<String, String> queryParams = Util.getQueryParams(exchange.getRequestURI().getQuery());
         OutputStream os = exchange.getResponseBody();
         exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -37,8 +37,7 @@ public class CreateClanHandler implements HttpHandler {
             Clan clan = clanService.create(name);
             answer = clanJsonMapper.getJson(clan);
             exchange.sendResponseHeaders(201, answer.getBytes(StandardCharsets.UTF_8).length);
-        }
-        catch (ClanValidationException ex){
+        } catch (ClanValidationException ex) {
             HashMap<Object, Object> errors = ex.getErrors();
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);

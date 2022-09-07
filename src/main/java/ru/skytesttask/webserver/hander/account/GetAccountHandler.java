@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.Account;
 import ru.skytesttask.service.IAccountService;
 import ru.skytesttask.service.exceptions.AccountNotFoundException;
-import ru.skytesttask.service.impl.AccountService;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
 
@@ -20,11 +19,12 @@ public class GetAccountHandler implements HttpHandler {
     private final IAccountService accountService;
     private final JsonMapper<Account> accountJsonMapper;
 
-    public GetAccountHandler(IAccountService accountService){
+    public GetAccountHandler(IAccountService accountService) {
         super();
         this.accountService = accountService;
         this.accountJsonMapper = new JsonMapper<>(Account.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
@@ -35,8 +35,7 @@ public class GetAccountHandler implements HttpHandler {
         Integer accountId = null;
         try {
             accountId = Integer.valueOf(queryParams.get("id"));
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             errors.put("id", "id must be integer");
         }
 
@@ -44,16 +43,14 @@ public class GetAccountHandler implements HttpHandler {
         try {
             if (accountId != null) account = accountService.getById(accountId);
             else errors.put("request", "You should pass  id to find account");
-        }
-        catch (AccountNotFoundException ex) {
+        } catch (AccountNotFoundException ex) {
             errors.put("identity", "account not found");
         }
         String answer;
         if (errors.isEmpty()) {
             answer = accountJsonMapper.getJson(account);
             exchange.sendResponseHeaders(200, answer.getBytes(StandardCharsets.UTF_8).length);
-        }
-        else {
+        } else {
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);
         }

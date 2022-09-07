@@ -1,0 +1,379 @@
+swagger: "2.0"
+info:
+  description: "Scytec games task api specification"
+  version: "1.0.0"
+  title: "Scytec games task api specification"
+  termsOfService: ""
+  contact:
+    email: "artemd55131@gmail.com"
+
+host: "-"
+basePath: "/api"
+
+schemes:
+- "https"
+- "http"
+paths:
+  /user/create:
+    post:
+      description: "create a User"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "name"
+        required: true
+        type: "string"
+      responses:
+        "201":
+          description: "user created"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "user creation failed"
+          
+  /user/get:
+    get:
+      description: "get a User by id or name"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "id"
+        required: false
+        type: "integer"
+        
+      - in: "query"
+        name: "name"
+        required: false
+        type: "string"
+        
+      responses:
+        "200":
+          description: "user found"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "user not found"     
+
+  /user/getall:
+    get:
+      description: "get all Users"
+      produces:
+      - "application/json"
+
+      responses:
+        "200":
+          description: ""
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+  
+  /user/addtocalan:
+    post:
+      description: "add a user to clan"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "userid"
+        required: true
+        type: "integer"
+        
+      - in: "query"
+        name: "clanid"
+        required: true
+        type: "integer"
+        
+      responses:
+        "200":
+          description: "successfully added"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "array of errors" 
+  
+  /clan/get:
+    get:
+      description: "get clan by id or name"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "id"
+        required: false
+        type: "integer"
+        
+      - in: "query"
+        name: "name"
+        required: false
+        type: "string"
+        
+      responses:
+        "200":
+          description: "clan found"
+          schema:
+            $ref: "#/definitions/Clan"
+        "400":
+          description: "array of errors"            
+
+  /clan/create:
+    post:
+      description: "create a new clan"
+      produces:
+      - "application/json"
+      parameters:
+
+      - in: "query"
+        name: "name"
+        required: true
+        type: "string"
+        
+      responses:
+        "201":
+          description: "created"
+          schema:
+            $ref: "#/definitions/Clan"
+        "400":
+          description: "array of errors"     
+  
+  /clan/getall:
+    get:
+      description: "get all clans"
+      produces:
+      - "application/json"
+
+      responses:
+        "200":
+          description: ""
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Clan"
+
+  /account/get:
+    get:
+      description: "get account by id"
+      produces:
+      - "application/json"
+      
+      parameters:
+      - in: "query"
+        name: "id"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "account found"
+          schema:
+              $ref: "#/definitions/Account"
+              
+        "400":
+          description: "array of errors"   
+
+  /account/history:
+    get:
+      description: "get history of account transactions"
+      produces:
+      - "application/json"
+      
+      parameters:
+      - in: "query"
+        name: "id"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "account found"
+          schema:
+              type: array
+              items:
+                $ref: "#/definitions/BalanceHistoryItem"
+              
+        "400":
+          description: "array of errors"     
+          
+  /transaction/usertoclan:
+    post:
+      description: "user add gold to it's clan"
+      produces:
+      - "application/json"
+      
+      parameters:
+      - in: "query"
+        name: "userid"
+        required: true
+        type: "integer"
+        
+      - in: "query"
+        name: "amount"
+        required: true
+        type: "integer"
+        
+      responses:
+        "200":
+          description: "transaction succeed"
+          schema:
+              $ref: "#/definitions/Transaction"
+              
+        "400":
+          description: "array of errors, transaction declined"      
+    
+  /transaction/clantoclan:
+    post:
+      description: "clan add gold to other clan"
+      produces:
+      - "application/json"
+      
+      parameters:
+      - in: "query"
+        name: "clanidfrom"
+        required: true
+        type: "integer"
+        
+      - in: "query"
+        name: "clanidto"
+        required: true
+        type: "integer"
+        
+      - in: "query"
+        name: "amount"
+        required: true
+        type: "integer"
+        
+      responses:
+        "200":
+          description: "transaction succeed"
+          schema:
+              $ref: "#/definitions/Transaction"
+              
+        "400":
+          description: "array of errors, transaction declined"     
+
+  /transaction/systemtoclan:
+    post:
+      description: "system add gold to other clan, for compliting quest for example"
+      produces:
+      - "application/json"
+      
+      parameters:
+      - in: "query"
+        name: "clanid"
+        required: true
+        type: "integer"
+        
+      - in: "query"
+        name: "amount"
+        required: true
+        type: "integer"
+        
+      responses:
+        "200":
+          description: "transaction succeed"
+          schema:
+              $ref: "#/definitions/Transaction"
+              
+        "400":
+          description: "array of errors, transaction declined"   
+          
+  /transaction/getbyaccount:
+    get:
+      description: "Get all transactions from (or) to some account."
+      produces:
+      - "application/json"
+      
+      parameters:
+      - in: "query"
+        name: "accountfromid"
+        required: false
+        type: "integer"
+        
+      - in: "query"
+        name: "accounttoid"
+        required: false
+        type: "integer"
+        
+      responses:
+        "200":
+          description: "history of transactions from (or) to some account"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Transaction"
+              
+        "400":
+          description: "array of errors, account not found for example"   
+definitions:
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      accountId:
+        type: "integer"
+      clanId:
+        type: "integer"
+  
+  Clan:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+      accountId:
+        type: "integer"
+        
+  Account:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      ownerId:
+        type: "integer"
+      ownerType:
+        type: "string"
+      balance:
+        type: "integer"
+  
+  Transaction:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      fromId:
+        type: "integer"
+      toId:
+        type: "integer"
+      amount:
+        type: "integer"
+      createdAt:
+        type: "string"
+      updatedAt:
+        type: "string"
+      state:
+        type: "string"
+      type:
+        type: "string"
+      infoJson:
+        type: "string"
+        description: "Inner json contains transaction errors"
+        
+  BalanceHistoryItem:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      balanceBefore:
+        type: "integer"
+      balanceAfter:
+        type: "integer"
+      accountId:
+        type: "integer"
+      transactionId:
+        type: "integer"
+
+

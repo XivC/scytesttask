@@ -9,29 +9,28 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class UserRepository {
-    public User getByName(String name){
-            ArrayList<ArrayList<Object>> params = new ArrayList<>();
-            ArrayList<Object> scriptParams = new ArrayList<>();
-            scriptParams.add(name);
-            params.add(scriptParams);
-            ScriptExecutor executor = new ScriptExecutor();
-            executor.executeScript("user/get_by_name.sql", params );
-            ResultSet targetResult = executor.getResultSets().get(0);
-            try {
-                if (!targetResult.next()) return null;
-                User res = getByRow(targetResult);
-                executor.closeConnection();
-                return res;
+    public User getByName(String name) {
+        ArrayList<ArrayList<Object>> params = new ArrayList<>();
+        ArrayList<Object> scriptParams = new ArrayList<>();
+        scriptParams.add(name);
+        params.add(scriptParams);
+        ScriptExecutor executor = new ScriptExecutor();
+        executor.executeScript("user/get_by_name.sql", params);
+        ResultSet targetResult = executor.getResultSets().get(0);
+        try {
+            if (!targetResult.next()) return null;
+            User res = getByRow(targetResult);
+            executor.closeConnection();
+            return res;
 
-            }
-            catch (SQLException ex){
-                throw new RuntimeException(ex);
-            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
 
 
     }
 
-    public int create(User user){
+    public int create(User user) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(user.getName());
@@ -46,8 +45,7 @@ public class UserRepository {
             int res = (int) keyResultSet.getObject(1);
             executor.closeConnection();
             return res;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
 
@@ -66,7 +64,7 @@ public class UserRepository {
         executor.closeConnection();
     }
 
-    public User getById(int userId){
+    public User getById(int userId) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(userId);
@@ -83,14 +81,13 @@ public class UserRepository {
             executor.closeConnection();
             return res;
 
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
 
     }
 
-    public LinkedList<User> getAll(){
+    public LinkedList<User> getAll() {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         LinkedList<User> users = new LinkedList<>();
@@ -102,8 +99,7 @@ public class UserRepository {
             while (targetResult.next()) {
                 users.add(getByRow(targetResult));
             }
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
         return users;

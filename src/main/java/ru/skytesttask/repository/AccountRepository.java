@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class AccountRepository {
-    public Account getById(int id){
+    public Account getById(int id) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(id);
@@ -26,12 +26,12 @@ public class AccountRepository {
             }
             executor.closeConnection();
             return res;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
-    public int create(Account account){
+
+    public int create(Account account) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(account.getOwnerId());
@@ -40,19 +40,18 @@ public class AccountRepository {
         params.add(scriptParams);
         ScriptExecutor executor = new ScriptExecutor();
         executor.executeScript("account/create.sql", params);
-       try {
-           ResultSet keyResultSet = executor.getGeneratedKeys().get(0);
-           keyResultSet.next();
-           int res = (int) keyResultSet.getObject(1);
-           executor.closeConnection();
-           return res;
-       }
-        catch (SQLException ex){
+        try {
+            ResultSet keyResultSet = executor.getGeneratedKeys().get(0);
+            keyResultSet.next();
+            int res = (int) keyResultSet.getObject(1);
+            executor.closeConnection();
+            return res;
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public void update(Account account){
+    public void update(Account account) {
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
         scriptParams.add(account.getOwnerId());
@@ -66,7 +65,7 @@ public class AccountRepository {
 
     }
 
-    public LinkedList<AccountBalanceHistoryItem> getAccountHistory(Account account){
+    public LinkedList<AccountBalanceHistoryItem> getAccountHistory(Account account) {
         LinkedList<AccountBalanceHistoryItem> result = new LinkedList<>();
         ArrayList<ArrayList<Object>> params = new ArrayList<>();
         ArrayList<Object> scriptParams = new ArrayList<>();
@@ -76,12 +75,11 @@ public class AccountRepository {
         executor.executeScript("account/get_balance_log.sql", params);
         ResultSet resultSet = executor.getResultSets().get(0);
         try {
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 result.add(getHistoryItemByRow(resultSet));
             }
             return result;
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -91,10 +89,10 @@ public class AccountRepository {
         int ownerId = resultSet.getInt(2);
         AccountOwnerType type = AccountOwnerType.valueOf(resultSet.getString(3));
         int balance = resultSet.getInt(4);
-        return new Account(id, ownerId,  balance, type);
+        return new Account(id, ownerId, balance, type);
     }
 
-    private AccountBalanceHistoryItem getHistoryItemByRow(ResultSet resultSet) throws SQLException{
+    private AccountBalanceHistoryItem getHistoryItemByRow(ResultSet resultSet) throws SQLException {
         return new AccountBalanceHistoryItem(
                 resultSet.getInt(1),
                 resultSet.getInt(2),

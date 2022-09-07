@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.Account;
 import ru.skytesttask.service.IAccountService;
 import ru.skytesttask.service.exceptions.AccountNotFoundException;
-import ru.skytesttask.service.impl.AccountService;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
 
@@ -20,7 +19,7 @@ public class GetAccountHistoryHandler implements HttpHandler {
 
     private final IAccountService accountService;
 
-    public GetAccountHistoryHandler(IAccountService accountService){
+    public GetAccountHistoryHandler(IAccountService accountService) {
         super();
         this.accountService = accountService;
     }
@@ -34,8 +33,7 @@ public class GetAccountHistoryHandler implements HttpHandler {
         Integer accountId = null;
         try {
             accountId = Integer.valueOf(queryParams.get("id"));
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             errors.put("id", "id must be integer");
         }
 
@@ -43,16 +41,14 @@ public class GetAccountHistoryHandler implements HttpHandler {
         try {
             if (accountId != null) account = accountService.getById(accountId);
             else errors.put("request", "You should pass  id to find account");
-        }
-        catch (AccountNotFoundException ex) {
+        } catch (AccountNotFoundException ex) {
             errors.put("identity", "account not found");
         }
         String answer;
         if (errors.isEmpty()) {
             answer = (new JsonMapper<>(LinkedList.class)).getJson(accountService.getAccountHistory(account));
             exchange.sendResponseHeaders(200, answer.getBytes(StandardCharsets.UTF_8).length);
-        }
-        else {
+        } else {
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);
         }

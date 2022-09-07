@@ -1,5 +1,7 @@
 package ru.skytesttask.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 
 public class Transaction {
@@ -7,7 +9,9 @@ public class Transaction {
     private int fromId;
     private int toId;
     private int amount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime updatedAt;
     private TransactionState state;
     private TransactionType type;

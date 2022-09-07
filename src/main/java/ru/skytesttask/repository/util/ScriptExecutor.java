@@ -1,6 +1,5 @@
 package ru.skytesttask.repository.util;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,14 +11,14 @@ public class ScriptExecutor {
     private LinkedList<ResultSet> generatedKeys;
     private final Connection connection;
 
-    public ScriptExecutor(){
+    public ScriptExecutor() {
         try {
             this.connection = Storage.getConnectionPool().getConnection();
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
+
     public LinkedList<ResultSet> getResultSets() {
         return resultSets;
     }
@@ -28,11 +27,10 @@ public class ScriptExecutor {
         return generatedKeys;
     }
 
-    public void closeConnection(){
+    public void closeConnection() {
         try {
             this.connection.close();
-        }
-        catch (SQLException ex){
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -75,11 +73,12 @@ public class ScriptExecutor {
                     queryCounter++;
 
                 }
-                if (!autocommit) {connection.commit();}
+                if (!autocommit) {
+                    connection.commit();
+                }
 
                 this.resultSets = result;
                 this.generatedKeys = keys;
-
 
 
             } catch (FileNotFoundException ex) {
@@ -98,7 +97,7 @@ public class ScriptExecutor {
         this.executeScript(scriptPath, params, true);
     }
 
-    public void executeTransaction(String scriptPath, ArrayList<ArrayList<Object>> params){
+    public void executeTransaction(String scriptPath, ArrayList<ArrayList<Object>> params) {
         this.executeScript(scriptPath, params, false);
     }
 }

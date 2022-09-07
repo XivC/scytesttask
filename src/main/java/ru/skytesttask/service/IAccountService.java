@@ -9,8 +9,11 @@ import java.util.LinkedList;
 
 public interface IAccountService {
     Account getById(int id) throws AccountNotFoundException;
+
     void save(Account account);
+
     Account create(int balance, AccountOwnerType ownerType);
+
     LinkedList<AccountBalanceHistoryItem> getAccountHistory(Account account);
 
 

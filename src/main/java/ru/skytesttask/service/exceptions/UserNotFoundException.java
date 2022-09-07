@@ -1,4 +1,4 @@
 package ru.skytesttask.service.exceptions;
 
-public class UserNotFoundException extends Exception{
+public class UserNotFoundException extends Exception {
 }

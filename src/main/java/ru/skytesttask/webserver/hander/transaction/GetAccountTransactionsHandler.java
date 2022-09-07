@@ -2,10 +2,7 @@ package ru.skytesttask.webserver.hander.transaction;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import ru.skytesttask.entity.Transaction;
 import ru.skytesttask.service.ITransactionService;
-import ru.skytesttask.service.exceptions.TransactionNotFoundException;
-import ru.skytesttask.service.impl.TransactionService;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
 
@@ -20,10 +17,11 @@ public class GetAccountTransactionsHandler implements HttpHandler {
 
     private final ITransactionService transactionService;
 
-    public GetAccountTransactionsHandler(ITransactionService transactionService){
+    public GetAccountTransactionsHandler(ITransactionService transactionService) {
         super();
         this.transactionService = transactionService;
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         Map<String, String> queryParams = Util.getQueryParams(exchange.getRequestURI().getQuery());
@@ -37,25 +35,22 @@ public class GetAccountTransactionsHandler implements HttpHandler {
 
         try {
             if (accountFromIdString != null) accountFromId = Integer.valueOf(accountFromIdString);
-        }
-        catch (NumberFormatException ex) {
-             errors.put("accountfromid", "Id should be number");
+        } catch (NumberFormatException ex) {
+            errors.put("accountfromid", "Id should be number");
         }
 
         try {
             if (accountToIdString != null) accountToId = Integer.valueOf(accountToIdString);
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             errors.put("accounttoid", "Id should be number");
         }
         String answer;
         if (errors.isEmpty()) {
-             answer = (new JsonMapper<>(LinkedList.class)).getJson(
-                     transactionService.getAccountTransactions(accountFromId, accountToId)
-             );
+            answer = (new JsonMapper<>(LinkedList.class)).getJson(
+                    transactionService.getAccountTransactions(accountFromId, accountToId)
+            );
             exchange.sendResponseHeaders(200, answer.getBytes(StandardCharsets.UTF_8).length);
-        }
-        else {
+        } else {
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);
         }

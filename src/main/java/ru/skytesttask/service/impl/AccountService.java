@@ -9,13 +9,14 @@ import ru.skytesttask.service.exceptions.AccountNotFoundException;
 
 import java.util.LinkedList;
 
-public class AccountService  implements IAccountService {
+public class AccountService implements IAccountService {
 
     private final AccountRepository accountRepository;
 
-    public AccountService(){
+    public AccountService() {
         this.accountRepository = new AccountRepository();
     }
+
     @Override
     public Account getById(int id) throws AccountNotFoundException {
         Account account = accountRepository.getById(id);
@@ -24,7 +25,7 @@ public class AccountService  implements IAccountService {
     }
 
     @Override
-    public LinkedList<AccountBalanceHistoryItem> getAccountHistory(Account account){
+    public LinkedList<AccountBalanceHistoryItem> getAccountHistory(Account account) {
         return this.accountRepository.getAccountHistory(account);
     }
 
@@ -35,7 +36,7 @@ public class AccountService  implements IAccountService {
 
     @Override
     public Account create(int balance, AccountOwnerType ownerType) {
-        Account account = new Account(0,0, balance, ownerType);
+        Account account = new Account(0, 0, balance, ownerType);
         account.setId(accountRepository.create(account));
         return account;
 

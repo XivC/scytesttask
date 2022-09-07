@@ -8,8 +8,6 @@ import ru.skytesttask.service.ITransactionService;
 import ru.skytesttask.service.IUserService;
 import ru.skytesttask.service.exceptions.ClanNotFoundException;
 import ru.skytesttask.service.exceptions.UserNotFoundException;
-import ru.skytesttask.service.impl.TransactionService;
-import ru.skytesttask.service.impl.UserService;
 import ru.skytesttask.util.validation.exceptions.TransactionValidationException;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
@@ -26,13 +24,15 @@ public class UserAddGoldToClanHandler implements HttpHandler {
     private final IUserService userService;
     private final JsonMapper<Transaction> transactionJsonMapper;
 
-    public UserAddGoldToClanHandler(ITransactionService transactionService, IUserService userService){
+    public UserAddGoldToClanHandler(ITransactionService transactionService, IUserService userService) {
         this.transactionService = transactionService;
         this.userService = userService;
         this.transactionJsonMapper = new JsonMapper<>(Transaction.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equals("POST")) return;
         Map<String, String> queryParams = Util.getQueryParams(exchange.getRequestURI().getQuery());
         OutputStream os = exchange.getResponseBody();
         exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -44,15 +44,13 @@ public class UserAddGoldToClanHandler implements HttpHandler {
 
         try {
             userId = Integer.valueOf(userIdString);
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             errors.put("userid", "User id must be integer");
         }
 
-        try{
+        try {
             amount = Integer.valueOf(amountString);
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             errors.put("amount", "amount must be integer");
         }
 
@@ -60,31 +58,27 @@ public class UserAddGoldToClanHandler implements HttpHandler {
         try {
             if (userId != null) user = userService.getById(userId);
             else errors.put("userid", "userid is required param");
-        }
-        catch (UserNotFoundException ex){
+        } catch (UserNotFoundException ex) {
             errors.put("identity", "user with id " + userIdString + " not found");
         }
 
         String answer = "";
         try {
-            if (user != null && amount != null){
+            if (user != null && amount != null) {
 
                 Transaction transaction = transactionService.userAddGoldToClan(user, amount);
                 answer = transactionJsonMapper.getJson(transaction);
 
             }
-        }
-        catch (TransactionValidationException ex){
+        } catch (TransactionValidationException ex) {
             errors.putAll(ex.getErrors());
-        }
-        catch (ClanNotFoundException ex) {
+        } catch (ClanNotFoundException ex) {
             errors.put("clan", "user not in clan");
         }
-        if (errors.isEmpty()){
+        if (errors.isEmpty()) {
             exchange.sendResponseHeaders(200, answer.getBytes(StandardCharsets.UTF_8).length);
 
-        }
-        else {
+        } else {
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);
         }

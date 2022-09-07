@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.User;
 import ru.skytesttask.service.IUserService;
-import ru.skytesttask.service.impl.UserService;
 import ru.skytesttask.webserver.util.JsonMapper;
 
 import java.io.IOException;
@@ -17,11 +16,12 @@ public class GetAllUsersHandler implements HttpHandler {
     private final IUserService userService;
     private final JsonMapper<LinkedList> usersListJsonMapper;
 
-    public GetAllUsersHandler(IUserService userService){
+    public GetAllUsersHandler(IUserService userService) {
         super();
         this.userService = userService;
         this.usersListJsonMapper = new JsonMapper<>(LinkedList.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         OutputStream os = exchange.getResponseBody();

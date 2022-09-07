@@ -1,6 +1,6 @@
 package ru.skytesttask.entity;
 
-public class AccountBalanceHistoryItem implements Payable{
+public class AccountBalanceHistoryItem implements Payable {
     Integer id;
     Integer balanceBefore;
     Integer balanceAfter;

@@ -6,7 +6,6 @@ import ru.skytesttask.entity.User;
 import ru.skytesttask.service.IUserService;
 import ru.skytesttask.service.exceptions.ClanNotFoundException;
 import ru.skytesttask.service.exceptions.UserNotFoundException;
-import ru.skytesttask.service.impl.UserService;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
 
@@ -21,13 +20,15 @@ public class UserAddToClanHandler implements HttpHandler {
     private final IUserService userService;
     private final JsonMapper<User> userJsonMapper;
 
-    public UserAddToClanHandler(IUserService userService){
+    public UserAddToClanHandler(IUserService userService) {
         super();
         this.userService = userService;
         this.userJsonMapper = new JsonMapper<>(User.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equals("POST")) return;
         Map<String, String> queryParams = Util.getQueryParams(exchange.getRequestURI().getQuery());
         HashMap<Object, Object> errors = new HashMap<>();
         OutputStream os = exchange.getResponseBody();
@@ -37,21 +38,19 @@ public class UserAddToClanHandler implements HttpHandler {
         Integer userId = null;
         String clanIdString = queryParams.get("clanid");
         String userIdString = queryParams.get("userid");
-        if (clanIdString == null)  errors.put("clanid", "clanid can't be void");
+        if (clanIdString == null) errors.put("clanid", "clanid can't be void");
         else {
             try {
                 clanId = Integer.valueOf(clanIdString);
-            }
-            catch (NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 errors.put("clanid", "clanid must beinteger");
             }
         }
-        if (userIdString == null)  errors.put("userid", "userid can't be void");
+        if (userIdString == null) errors.put("userid", "userid can't be void");
         else {
             try {
                 userId = Integer.valueOf(userIdString);
-            }
-            catch (NumberFormatException ex){
+            } catch (NumberFormatException ex) {
                 errors.put("userid", "userid must beinteger");
             }
         }
@@ -59,8 +58,7 @@ public class UserAddToClanHandler implements HttpHandler {
         User user = null;
         try {
             if (userId != null) user = userService.getById(userId);
-        }
-        catch (UserNotFoundException ex) {
+        } catch (UserNotFoundException ex) {
             errors.put("user", "user with id " + userIdString + " not found");
         }
 
@@ -73,8 +71,7 @@ public class UserAddToClanHandler implements HttpHandler {
         if (errors.isEmpty()) {
             answer = userJsonMapper.getJson(user);
             exchange.sendResponseHeaders(200, answer.getBytes(StandardCharsets.UTF_8).length);
-        }
-        else {
+        } else {
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);
         }

@@ -87,17 +87,15 @@ public class TransactionService implements ITransactionService {
         return transaction;
     }
 
-    public Transaction getById(int id) throws TransactionNotFoundException{
+    public Transaction getById(int id) throws TransactionNotFoundException {
         Transaction transaction = transactionRepository.getById(id);
         if (transaction == null) throw new TransactionNotFoundException();
         return transaction;
     }
 
-    public LinkedList<Transaction> getAccountTransactions(Integer accountFromId, Integer accountToId){
+    public LinkedList<Transaction> getAccountTransactions(Integer accountFromId, Integer accountToId) {
         return transactionRepository.getAccountTransactions(accountFromId, accountToId);
     }
-
-
 
 
     private void tryToPerform(Transaction transaction) throws TransactionValidationException {
