@@ -1,8 +1,13 @@
 # Тестовое задание в Scytec Games
 
 ## Установка и запуск
-> mvn clean package \n
-> java -jar target/scytesttask-1.0-jar-with-dependencies.jar
+
+```
+git clone https://github.com/XivC/scytesttask.git
+cd scytesttask
+mvn clean package 
+java -jar target/scytesttask-1.0-jar-with-dependencies.jar
+```
 
 Сервер разворачивается на 80-м порте.
 Документация к api прилагается в файле **api.yaml**
