@@ -1,21 +1,18 @@
 package ru.skytesttask.repository.util;
 
-import java.io.File;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Scanner;
 
 public class Util {
-     static File getResFile(String path) {
+     static Scanner getResFile(String path) throws FileNotFoundException {
         ClassLoader classLoader = Storage.class.getClassLoader();
-        URL resource = classLoader.getResource(path);
-        if (resource == null) {
-            throw new IllegalArgumentException("No file found " + path);
-        } else {
-            try {
-                return new File(resource.toURI());
-            } catch (URISyntaxException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
+        InputStream in = classLoader.getResourceAsStream(path);
+        if (in == null) throw new FileNotFoundException("File " + path + " not found");
+         return new Scanner(in);
+
+
+
     }
 }

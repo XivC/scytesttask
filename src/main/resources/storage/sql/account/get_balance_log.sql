@@ -1,0 +1,1 @@
+SELECT * FROM account_transactions_log WHERE account_id = ?;

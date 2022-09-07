@@ -4,6 +4,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.Clan;
 import ru.skytesttask.entity.Transaction;
+import ru.skytesttask.service.IClanService;
+import ru.skytesttask.service.ITransactionService;
 import ru.skytesttask.service.exceptions.ClanNotFoundException;
 import ru.skytesttask.service.impl.ClanService;
 import ru.skytesttask.service.impl.TransactionService;
@@ -19,13 +21,13 @@ import java.util.Map;
 
 public class SystemAddGoldToClanHandler implements HttpHandler {
 
-    private final TransactionService transactionService;
-    private final ClanService clanService;
+    private final ITransactionService transactionService;
+    private final IClanService clanService;
     private final JsonMapper<Transaction> transactionJsonMapper;
 
-    public SystemAddGoldToClanHandler(){
-        this.transactionService = new TransactionService();
-        this.clanService = new ClanService();
+    public SystemAddGoldToClanHandler(ITransactionService transactionService){
+        this.transactionService = transactionService;
+        this.clanService = transactionService.getClanService();
         this.transactionJsonMapper = new JsonMapper<>(Transaction.class);
     }
     @Override
@@ -75,7 +77,7 @@ public class SystemAddGoldToClanHandler implements HttpHandler {
         try {
             if (clan != null &&  amount != null){
 
-                Transaction transaction = transactionService.SystemAddGoldToClan(clan, amount);
+                Transaction transaction = transactionService.systemAddGoldToClan(clan, amount);
                 answer = transactionJsonMapper.getJson(transaction);
 
             }

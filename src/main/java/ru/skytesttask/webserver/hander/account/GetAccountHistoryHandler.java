@@ -13,21 +13,20 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
-public class GetAccountHandler implements HttpHandler {
+public class GetAccountHistoryHandler implements HttpHandler {
 
     private final IAccountService accountService;
-    private final JsonMapper<Account> accountJsonMapper;
 
-    public GetAccountHandler(IAccountService accountService){
+    public GetAccountHistoryHandler(IAccountService accountService){
         super();
         this.accountService = accountService;
-        this.accountJsonMapper = new JsonMapper<>(Account.class);
     }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-
         Map<String, String> queryParams = Util.getQueryParams(exchange.getRequestURI().getQuery());
         OutputStream os = exchange.getResponseBody();
         exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -50,14 +49,13 @@ public class GetAccountHandler implements HttpHandler {
         }
         String answer;
         if (errors.isEmpty()) {
-            answer = accountJsonMapper.getJson(account);
+            answer = (new JsonMapper<>(LinkedList.class)).getJson(accountService.getAccountHistory(account));
             exchange.sendResponseHeaders(200, answer.getBytes(StandardCharsets.UTF_8).length);
         }
         else {
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);
         }
-
         os.write(answer.getBytes(StandardCharsets.UTF_8));
         os.close();
 

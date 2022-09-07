@@ -42,10 +42,9 @@ public class ScriptExecutor {
         LinkedList<ResultSet> keys = new LinkedList<>();
         try {
 
-            File scriptFile = Util.getResFile("storage/sql/" + scriptPath);
             connection.setAutoCommit(autocommit);
             try {
-                Scanner scanner = new Scanner(scriptFile).useDelimiter(";");
+                Scanner scanner = Util.getResFile("storage/sql/" + scriptPath).useDelimiter(";");
                 int queryCounter = 0;
 
                 while (scanner.hasNext()) {

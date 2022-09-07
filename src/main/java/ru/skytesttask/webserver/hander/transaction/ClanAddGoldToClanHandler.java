@@ -4,12 +4,11 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.Clan;
 import ru.skytesttask.entity.Transaction;
-import ru.skytesttask.entity.User;
+import ru.skytesttask.service.IClanService;
+import ru.skytesttask.service.ITransactionService;
 import ru.skytesttask.service.exceptions.ClanNotFoundException;
-import ru.skytesttask.service.exceptions.UserNotFoundException;
 import ru.skytesttask.service.impl.ClanService;
 import ru.skytesttask.service.impl.TransactionService;
-import ru.skytesttask.service.impl.UserService;
 import ru.skytesttask.util.validation.exceptions.TransactionValidationException;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
@@ -22,13 +21,13 @@ import java.util.Map;
 
 public class ClanAddGoldToClanHandler implements HttpHandler {
 
-    private final TransactionService transactionService;
-    private final ClanService clanService;
+    private final ITransactionService transactionService;
+    private final IClanService clanService;
     private final JsonMapper<Transaction> transactionJsonMapper;
 
-    public ClanAddGoldToClanHandler(){
-        this.transactionService = new TransactionService();
-        this.clanService = new ClanService();
+    public ClanAddGoldToClanHandler(ITransactionService transactionService){
+        this.transactionService = transactionService;
+        this.clanService = transactionService.getClanService();
         this.transactionJsonMapper = new JsonMapper<>(Transaction.class);
     }
     @Override
@@ -88,7 +87,7 @@ public class ClanAddGoldToClanHandler implements HttpHandler {
         try {
             if (clanFrom != null && clanTo != null && amount != null){
 
-                Transaction transaction = transactionService.ClanAddGoldToClan(clanFrom, clanTo, amount);
+                Transaction transaction = transactionService.clanAddGoldToClan(clanFrom, clanTo, amount);
                 answer = transactionJsonMapper.getJson(transaction);
 
             }

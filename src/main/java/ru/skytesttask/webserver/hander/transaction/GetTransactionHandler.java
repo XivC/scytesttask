@@ -5,12 +5,10 @@ import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.Transaction;
 import ru.skytesttask.entity.User;
 import ru.skytesttask.service.ITransactionService;
-import ru.skytesttask.service.IUserService;
-import ru.skytesttask.service.exceptions.ClanNotFoundException;
+import ru.skytesttask.service.exceptions.TransactionNotFoundException;
 import ru.skytesttask.service.exceptions.UserNotFoundException;
 import ru.skytesttask.service.impl.TransactionService;
 import ru.skytesttask.service.impl.UserService;
-import ru.skytesttask.util.validation.exceptions.TransactionValidationException;
 import ru.skytesttask.webserver.util.JsonMapper;
 import ru.skytesttask.webserver.util.Util;
 
@@ -20,15 +18,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserAddGoldToClanHandler implements HttpHandler {
-
+public class GetTransactionHandler implements HttpHandler {
     private final ITransactionService transactionService;
-    private final IUserService userService;
     private final JsonMapper<Transaction> transactionJsonMapper;
 
-    public UserAddGoldToClanHandler(ITransactionService transactionService, IUserService userService){
+    public GetTransactionHandler(ITransactionService transactionService){
+        super();
         this.transactionService = transactionService;
-        this.userService = userService;
         this.transactionJsonMapper = new JsonMapper<>(Transaction.class);
     }
     @Override
@@ -37,57 +33,32 @@ public class UserAddGoldToClanHandler implements HttpHandler {
         OutputStream os = exchange.getResponseBody();
         exchange.getResponseHeaders().set("Content-Type", "application/json");
         HashMap<Object, Object> errors = new HashMap<>();
-        String userIdString = queryParams.get("userid");
-        String amountString = queryParams.get("amount");
-        Integer userId = null;
-        Integer amount = null;
-
+        Integer transactionId = null;
         try {
-            userId = Integer.valueOf(userIdString);
+            transactionId = Integer.valueOf(queryParams.get("id"));
         }
         catch (NumberFormatException ex) {
-            errors.put("userid", "User id must be integer");
+             errors.put("id", "Id should be number");
         }
 
-        try{
-            amount = Integer.valueOf(amountString);
-        }
-        catch (NumberFormatException ex) {
-            errors.put("amount", "amount must be integer");
-        }
-
-        User user = null;
+        Transaction transaction = null;
         try {
-            if (userId != null) user = userService.getById(userId);
-            else errors.put("userid", "userid is required param");
+            if (transactionId != null) transaction = transactionService.getById(transactionId);
+            else errors.put("request", "You should pass id to find transaction");
         }
-        catch (UserNotFoundException ex){
-            errors.put("identity", "user with id " + userIdString + " not found");
+        catch (TransactionNotFoundException ex) {
+            errors.put("identity", "transaction not found");
         }
-
         String answer = "";
-        try {
-            if (user != null && amount != null){
-
-                Transaction transaction = transactionService.userAddGoldToClan(user, amount);
-                answer = transactionJsonMapper.getJson(transaction);
-
-            }
-        }
-        catch (TransactionValidationException ex){
-            errors.putAll(ex.getErrors());
-        }
-        catch (ClanNotFoundException ex) {
-            errors.put("clan", "user not in clan");
-        }
-        if (errors.isEmpty()){
+        if (errors.isEmpty()) {
+            if (transaction != null) answer = transactionJsonMapper.getJson(transaction);
             exchange.sendResponseHeaders(200, answer.getBytes(StandardCharsets.UTF_8).length);
-
         }
         else {
             answer = (new JsonMapper<>(HashMap.class)).getJson(errors);
             exchange.sendResponseHeaders(400, answer.getBytes(StandardCharsets.UTF_8).length);
         }
+
         os.write(answer.getBytes(StandardCharsets.UTF_8));
         os.close();
 

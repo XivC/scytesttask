@@ -1,14 +1,15 @@
 package ru.skytesttask.repository;
 
-import ru.skytesttask.entity.Transaction;
-import ru.skytesttask.entity.TransactionState;
-import ru.skytesttask.entity.TransactionType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.skytesttask.entity.*;
 import ru.skytesttask.repository.util.ScriptExecutor;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class TransactionRepository {
     public Transaction getById(int id){
@@ -94,8 +95,48 @@ public class TransactionRepository {
         executor.closeConnection();
     }
 
+    public LinkedList<Transaction> getAccountTransactions(Integer from, Integer to){
+        LinkedList<Transaction> result = new LinkedList<>();
+        ArrayList<ArrayList<Object>> params = new ArrayList<>();
+        ArrayList<Object> scriptParams = new ArrayList<>();
+        params.add(scriptParams);
+        ScriptExecutor executor = new ScriptExecutor();
+        if (from == null && to == null) return result;
+        if (from == null) {
+            scriptParams.add(to);
+            executor.executeScript("transaction/get_account_to_transactions.sql", params);
+        }
+        else if (to == null) {
+            scriptParams.add(from);
+            executor.executeScript("transaction/get_account_from_transactions.sql", params);
+        }
+        else {
+            scriptParams.add(from);
+            scriptParams.add(to);
+            executor.executeScript("transaction/get_account_from_to_transactions.sql", params);
+        }
+        ResultSet resultSet = executor.getResultSets().get(0);
+        try {
+            while (resultSet.next()) {
+                result.add(getByRow(resultSet));
+            }
+            return result;
+        }
+        catch (SQLException ex){
+            throw new RuntimeException(ex);
+        }
+    }
+
 
     private Transaction getByRow(ResultSet resultSet) throws SQLException {
+        ObjectMapper mapper = new ObjectMapper();
+        String info;
+        try {
+            info = mapper.readTree(resultSet.getString(9)).asText();
+        }
+        catch (IOException ex){
+            throw new RuntimeException(ex);
+        }
         return new Transaction(
                 resultSet.getInt(1),
                 resultSet.getInt(2),
@@ -103,9 +144,13 @@ public class TransactionRepository {
                 resultSet.getInt(4),
                 resultSet.getObject(5, LocalDateTime.class),
                 resultSet.getObject(6, LocalDateTime.class),
-                resultSet.getObject(7, TransactionState.class),
-                resultSet.getObject(8, TransactionType.class),
-                resultSet.getString(9)
+                TransactionState.valueOf(resultSet.getString(7)),
+                TransactionType.valueOf(resultSet.getString(8)),
+                info
+
+
+
         );
     }
+
 }

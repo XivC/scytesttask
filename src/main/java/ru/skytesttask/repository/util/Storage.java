@@ -28,10 +28,8 @@ public class Storage {
 
     public static void init() {
 
-
-        File orderFile = Util.getResFile("storage/sql/migrations/order");
         try {
-            Scanner orderFileScanner = new Scanner(orderFile);
+            Scanner orderFileScanner = Util.getResFile("storage/sql/migrations/order");
             ScriptExecutor executor = new ScriptExecutor();
             while (orderFileScanner.hasNext()) {
 

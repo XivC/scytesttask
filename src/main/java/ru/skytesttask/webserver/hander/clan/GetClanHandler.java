@@ -3,6 +3,7 @@ package ru.skytesttask.webserver.hander.clan;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.Clan;
+import ru.skytesttask.service.IClanService;
 import ru.skytesttask.service.exceptions.ClanNotFoundException;
 import ru.skytesttask.service.impl.ClanService;
 import ru.skytesttask.webserver.util.JsonMapper;
@@ -15,12 +16,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GetClanHandler implements HttpHandler {
-    private final ClanService clanService;
+    private final IClanService clanService;
     private final JsonMapper<Clan> clanJsonMapper;
 
-    public GetClanHandler(){
+    public GetClanHandler(IClanService clanService){
         super();
-        this.clanService = new ClanService(); //DI should be better for injecting dependencies.
+        this.clanService = clanService;
         this.clanJsonMapper = new JsonMapper<>(Clan.class);
     }
     @Override

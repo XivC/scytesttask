@@ -3,6 +3,7 @@ package ru.skytesttask.webserver.hander.user;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.User;
+import ru.skytesttask.service.IUserService;
 import ru.skytesttask.service.impl.UserService;
 import ru.skytesttask.webserver.util.JsonMapper;
 
@@ -13,12 +14,12 @@ import java.util.LinkedList;
 
 public class GetAllUsersHandler implements HttpHandler {
 
-    private final UserService userService;
+    private final IUserService userService;
     private final JsonMapper<LinkedList> usersListJsonMapper;
 
-    public GetAllUsersHandler(){
+    public GetAllUsersHandler(IUserService userService){
         super();
-        this.userService = new UserService(); //DI should be better for injecting dependencies.
+        this.userService = userService;
         this.usersListJsonMapper = new JsonMapper<>(LinkedList.class);
     }
     @Override

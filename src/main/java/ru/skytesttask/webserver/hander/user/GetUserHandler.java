@@ -3,6 +3,7 @@ package ru.skytesttask.webserver.hander.user;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.skytesttask.entity.User;
+import ru.skytesttask.service.IUserService;
 import ru.skytesttask.service.exceptions.UserNotFoundException;
 import ru.skytesttask.service.impl.UserService;
 import ru.skytesttask.webserver.util.JsonMapper;
@@ -15,12 +16,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GetUserHandler implements HttpHandler {
-    private final UserService userService;
+    private final IUserService userService;
     private final JsonMapper<User> userJsonMapper;
 
-    public GetUserHandler(){
+    public GetUserHandler(IUserService userService){
         super();
-        this.userService = new UserService(); //DI should be better for injecting dependencies.
+        this.userService = userService;
         this.userJsonMapper = new JsonMapper<>(User.class);
     }
     @Override
